@@ -41,12 +41,20 @@ store guidelines on titles, icons and copy.
 | [.agents/git.md](.agents/git.md)               | Writing a commit message                                                 |
 | [.agents/secrets.md](.agents/secrets.md)       | Anything involving environment variables                                 |
 
+## Design Context
+
+Touching a command's UI (a `Detail`/`List`/`Form`, its Markdown, icons, or
+`ActionPanel`)? Read [PRODUCT.md](.agents/context/PRODUCT.md) (who this is for, positioning,
+personality) and [DESIGN.md](.agents/context/DESIGN.md) (the component and copy patterns
+already in use, e.g. status-line-first `Detail` views, no-hex colors) first.
+
 ## Precedence
 
 1. What the user explicitly asks for.
 2. `docs/architecture.md` on structure.
-3. `.agents/` on style and conventions.
-4. Your own defaults.
+3. `.agents/context/PRODUCT.md` / `.agents/context/DESIGN.md` on product intent and UI patterns.
+4. `.agents/` on style and conventions.
+5. Your own defaults.
 
 New code follows the rules. If existing code doesn't match a rule, leave it
 unless you're already editing that file for another reason, and even then don't
