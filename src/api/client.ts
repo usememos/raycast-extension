@@ -20,13 +20,25 @@ const readJson = async (response: Response): Promise<unknown> => {
   }
 };
 
-export const memosFetch = async <T>(connection: MemosConnection, path: string, schema: z.ZodType<T>): Promise<T> => {
+type JsonRequest = { method: "POST" | "PATCH"; body: unknown };
+
+export const memosFetch = async <T>(
+  connection: MemosConnection,
+  path: string,
+  schema: z.ZodType<T>,
+  request?: JsonRequest,
+): Promise<T> => {
   const { instanceUrl, accessToken } = connection;
-  const response = await send(
-    `${instanceUrl}${path}`,
-    { headers: { Accept: "application/json", Authorization: `Bearer ${accessToken}` } },
-    instanceUrl,
-  );
+  const headers: Record<string, string> = { Accept: "application/json", Authorization: `Bearer ${accessToken}` };
+  const init: RequestInit =
+    request == null
+      ? { headers }
+      : {
+          method: request.method,
+          headers: { ...headers, "Content-Type": "application/json" },
+          body: JSON.stringify(request.body),
+        };
+  const response = await send(`${instanceUrl}${path}`, init, instanceUrl);
   const body = await readJson(response);
 
   if (!response.ok) throw new ApiError(describeHttpFailure(response.status, body, instanceUrl), response.status);
