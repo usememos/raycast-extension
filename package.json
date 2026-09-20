@@ -17,9 +17,52 @@
     {
       "name": "setup",
       "title": "Setup Memos",
-      "subtitle": "Memos",
+      "subtitle": "Connect to Memos",
       "description": "Connect Raycast to your Memos instance and check that your access token works",
       "mode": "view"
+    },
+    {
+      "name": "search-memos",
+      "title": "Search Memos",
+      "subtitle": "List Memos",
+      "description": "Search your memos and preview them rendered as Markdown",
+      "mode": "view"
+    },
+    {
+      "name": "create-memo",
+      "title": "Create Memo",
+      "subtitle": "Create a new memo",
+      "description": "Write a memo in Markdown, preview it, and save it to Memos",
+      "mode": "view"
+    },
+    {
+      "name": "capture-memo",
+      "title": "Capture Memo",
+      "subtitle": "Quickly capture a memo",
+      "description": "Type a memo in Root Search and save it immediately",
+      "mode": "no-view",
+      "arguments": [
+        {
+          "name": "text",
+          "placeholder": "Memo",
+          "type": "text",
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "save-clipboard",
+      "title": "Save Clipboard as Memo",
+      "subtitle": "Save the text on your clipboard as a new memo",
+      "description": "Save the text on your clipboard as a new memo",
+      "mode": "no-view"
+    },
+    {
+      "name": "open-memos",
+      "title": "Open Memos",
+      "subtitle": "Open your Memos instance in the default browser",
+      "description": "Open your Memos instance in the default browser",
+      "mode": "no-view"
     }
   ],
   "preferences": [
@@ -39,6 +82,19 @@
       "type": "password",
       "required": true,
       "placeholder": "Paste your Memos access token"
+    },
+    {
+      "name": "defaultVisibility",
+      "title": "Default Visibility",
+      "description": "Visibility for new memos created from Raycast",
+      "type": "dropdown",
+      "required": true,
+      "default": "PRIVATE",
+      "data": [
+        { "title": "Private", "value": "PRIVATE" },
+        { "title": "Protected", "value": "PROTECTED" },
+        { "title": "Public", "value": "PUBLIC" }
+      ]
     }
   ],
   "tools": [],
