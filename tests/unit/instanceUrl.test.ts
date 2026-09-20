@@ -3,6 +3,7 @@ import {
   accessTokenSettingsUrl,
   DEFAULT_INSTANCE_URL,
   displayInstanceUrl,
+  memoUrl,
   normalizeInstanceUrl,
 } from "../../src/helpers/instanceUrl";
 
@@ -57,5 +58,11 @@ describe("accessTokenSettingsUrl", () => {
     expect(accessTokenSettingsUrl("https://demo.usememos.com")).toBe(
       "https://demo.usememos.com/setting#access-token",
     );
+  });
+});
+
+describe("memoUrl", () => {
+  it("links to the memo page on the instance", () => {
+    expect(memoUrl("https://memos.example.com", "memos/abc")).toBe("https://memos.example.com/memos/abc");
   });
 });
