@@ -34,9 +34,9 @@ to `features/`.
 | Directory           | Holds                                                                                                         | Rule                                                                                                                                                                    |
 | ------------------- | ------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `src/<command>.tsx` | The manifest entry point, e.g. `src/setup.tsx`                                                                | Composes exactly one hook and one component. No fetching, no markup logic beyond wiring props. Default export.                                                          |
-| `src/components/`   | Views (`SetupGuide.tsx`), action panels, and pure markdown builders (`setupGuideMarkdown.ts`)                 | Render and wire actions. Receive state and callbacks as props; no fetching.                                                                                             |
-| `src/hooks/`        | `@raycast/utils` async hooks (`useConnectionCheck.ts`)                                                        | Wrap `usePromise` / `useFetch` / `useCachedPromise`. Turn thrown errors into `errorMessage` strings via `toErrorMessage`; this is the bridge between `api/` and the UI. |
-| `src/api/`          | `memosFetch`, `ApiError`/`describeHttpFailure`, one file per Memos service (`auth.ts` today, `memo.ts` later) | The only place that calls `fetch`. Every response is parsed with a Zod schema in the same file, which also exports the inferred `z.infer` type.                         |
+| `src/components/`   | Views (`SetupGuide.tsx`, `SearchMemosList.tsx`, …), action panels, and pure state mappers (`setupStatus.ts`, `memoTitle.ts`) | Render and wire actions. Receive state and callbacks as props; no fetching.                                                                                             |
+| `src/hooks/`        | `@raycast/utils` async hooks (`useConnectionCheck.ts`, `useMemos.ts`, …)                                                      | Wrap `usePromise` / `useFetch` / `useCachedPromise`. Turn thrown errors into `errorMessage` strings via `toErrorMessage`; this is the bridge between `api/` and the UI. |
+| `src/api/`          | `memosFetch`, `ApiError`/`describeHttpFailure`, one file per Memos service (`auth.ts`, `memo.ts`)                             | The only place that calls `fetch`. Every response is parsed with a Zod schema in the same file, which also exports the inferred `z.infer` type.                         |
 | `src/helpers/`      | Framework-light utilities: `instanceUrl.ts`, `errors.ts`, `preferences.ts`                                    | `preferences.ts` is the only file that calls `getPreferenceValues`. Nothing here depends on `@raycast/api` beyond that one exception.                                   |
 | `src/tools/`        | Reserved for Raycast AI tools                                                                                 | Not created yet (later).                                                                                                                                                |
 
@@ -54,12 +54,14 @@ be imported from anywhere but imports nothing from `components/`, `hooks/` or
 
 ## Settings model
 
-The extension has two extension-level preferences, declared once in the
+The extension has three extension-level preferences, declared once in the
 manifest `preferences` array:
 
 - **`instanceUrl`** — textfield, not required, defaults to
   `https://demo.usememos.com`.
 - **`accessToken`** — password, required, no default.
+- **`defaultVisibility`** — dropdown (`PRIVATE` / `PROTECTED` / `PUBLIC`),
+  defaults to `PRIVATE`. Used by Create Memo, Capture Memo and Save Clipboard as Memo.
 
 Raycast can read preferences but can't write them, so there is no in-command
 setup form that saves values — the extension never persists its own copy of
@@ -90,11 +92,12 @@ Two helpers turn raw preference strings into a usable connection:
    `Authorization: Bearer <token>` header.
 5. `memosFetch` parses the JSON body against a Zod schema for `{ user }`, and
    returns the inner `user` object typed as `CurrentUser`.
-6. `SetupGuide` (`src/components/SetupGuide.tsx`) renders the markdown that
-   `buildSetupMarkdown` (`src/components/setupGuideMarkdown.ts`) builds from
-   that state, with actions for opening extension preferences, opening the
-   access-token settings page, retrying the connection check, and opening the
-   instance itself.
+6. `SetupGuide` (`src/components/SetupGuide.tsx`) renders a native `List`
+   checklist. `describeSetup` (`src/components/setupStatus.ts`) maps the
+   connection state into row titles, tones and tags. The Status section has
+   the Connection row; Settings has Instance URL and Access Token. Each row
+   carries its own actions (retry, copy error, open preferences, get token,
+   open Memos).
 
 The failure paths all end up in the same `errorMessage` slot, described in
 human terms by `describeHttpFailure` or the `memosFetch` transport catch:
@@ -130,6 +133,23 @@ never invents a transport string like `"Failed to fetch"` — if the thrown
 value has no message, it falls back to one explicit sentence telling the user
 to retry and file an issue, rather than leaking implementation detail.
 
+## Commands
+
+| Command | Mode | Entry |
+| --- | --- | --- |
+| Setup Memos | view | `src/setup.tsx` |
+| Search Memos | view | `src/search-memos.tsx` |
+| Create Memo | view | `src/create-memo.tsx` |
+| Capture Memo | no-view | `src/capture-memo.tsx` |
+| Save Clipboard as Memo | no-view | `src/save-clipboard.tsx` |
+| Open Memos | no-view | `src/open-memos.tsx` |
+
+## No-view commands
+
+No-view commands are the sanctioned exception to "a command composes a hook
+and a component". They may call `api/` directly and report through `showHUD`
+/ `showFailureToast`, because there is no view to compose.
+
 ## Adding a command
 
 Worked example: adding a `search-memos` command that lists memos.
@@ -156,20 +176,20 @@ Worked example: adding a `search-memos` command that lists memos.
 
 Unit tests live in `tests/unit/` and cover pure modules only: Zod schemas and
 the functions in `src/api/` (with `vi.stubGlobal("fetch")`), `src/helpers/`,
-and markdown builders like `setupGuideMarkdown.ts`. `@raycast/api` only exists
-inside the Raycast runtime, so anything that imports it — commands,
+and pure mappers like `setupStatus.ts` and `memoTitle.ts`. `@raycast/api` only
+exists inside the Raycast runtime, so anything that imports it — commands,
 components, hooks — can't be unit-tested and isn't; those are checked by hand
 with `pnpm dev` instead.
 
-The manual checklist for Setup Memos (from Task 4, Step 6): run `pnpm dev`.
-Raycast should ask for the access token first, with the instance URL already
-filled in as the demo. Then check four cases:
+The manual checklist for Setup Memos: run `pnpm dev`. Raycast should ask for
+the access token first, with the instance URL already filled in as the demo.
+Then check four cases:
 
-1. A valid demo token shows ✅ and your username.
-2. A wrong token shows the "rejected the access token" message, and ⌘T opens
-   `/setting#access-token`.
+1. A valid demo token shows ✓ "Connected as …" with Demo and Accepted tags.
+2. A wrong token shows ✗ "Couldn't connect", the Rejected tag, a failure
+   toast, and ⌘T opens `/setting#access-token`.
 3. An instance URL of `not a url` shows the "is not a valid instance URL"
-   message.
+   message on the Connection row.
 4. `https://example.com` shows either the "doesn't look like a Memos
    instance" message or the "doesn't recognize" message.
 
