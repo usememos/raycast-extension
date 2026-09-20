@@ -6,13 +6,18 @@ The official [Memos](https://usememos.com) extension for [Raycast](https://www.r
 
 ## Status
 
-This first release adds the connection setup. Memo commands for capture, search and browse will follow in later releases. See the [changelog](CHANGELOG.md).
+This release covers connection setup plus capture, search and open flows. See the [changelog](CHANGELOG.md).
 
 ## Commands
 
-| Command         | Description                                                     |
-| --------------- | --------------------------------------------------------------- |
-| **Setup Memos** | Connects Raycast to your instance and checks your access token. |
+| Command                     | Description                                                              |
+| --------------------------- | ------------------------------------------------------------------------ |
+| **Setup Memos**             | Connects Raycast to your instance and checks your access token.          |
+| **Search Memos**            | Searches memos and previews them rendered as Markdown.                   |
+| **Create Memo**             | Writes a memo in Markdown, previews it, and saves it to Memos.           |
+| **Capture Memo**            | Saves text typed in Root Search as a new memo.                           |
+| **Save Clipboard as Memo**  | Saves the text on your clipboard as a new memo.                          |
+| **Open Memos**              | Opens your Memos instance in the default browser.                        |
 
 ## Requirements
 
@@ -25,7 +30,7 @@ This first release adds the connection setup. Memo commands for capture, search 
 2. Run **Setup Memos**. Raycast asks for two settings.
 3. For **Instance URL**, enter your instance's address or keep `https://demo.usememos.com` to try it out.
 4. For **Access token**, open **Settings → Access Tokens** in Memos, create a token and paste it into Raycast. Use [the demo settings](https://demo.usememos.com/setting#access-token) or `https://<instance>/setting#access-token` for your own instance.
-5. The command confirms **Connected as …**. If it does not, it explains what to fix.
+5. The command confirms **Connected as …** with Accepted (and Demo, when using the public instance). If it does not, it explains what to fix.
 
 ## Changing settings later
 
