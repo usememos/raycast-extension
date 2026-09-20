@@ -32,3 +32,5 @@ export const displayInstanceUrl = (raw: string): string => {
 };
 
 export const accessTokenSettingsUrl = (instanceUrl: string) => `${instanceUrl}/setting#access-token`;
+
+export const memoUrl = (instanceUrl: string, memoName: string) => `${instanceUrl}/${memoName}`;
