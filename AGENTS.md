@@ -22,12 +22,14 @@ Raycast. People should start with [README.md](README.md).
 - **No comments** unless it's one line explaining _why_ something the code can't express.
 - **Commit only when asked**, as scoped Conventional Commits ([.agents/git.md](.agents/git.md)).
 - **Verify before you say it's done:** `pnpm lint && pnpm build && pnpm typecheck && pnpm test`.
+- **Store rules are not optional.** The extension ships through Raycast's
+  review. Read [.agents/store.md](.agents/store.md) before touching
+  `package.json`, `assets/`, `metadata/`, `CHANGELOG.md`, `README.md`, or any
+  command title, subtitle, action title or navigation title. Run
+  `pnpm store-check` afterwards and leave it green.
 
 **Settings live in Raycast preferences.** Never store the instance URL or
 token anywhere else (LocalStorage, files, code).
-
-**Store rules apply.** Everything must pass `ray lint`; follow Raycast's
-store guidelines on titles, icons and copy.
 
 ## Rule files
 
@@ -37,6 +39,7 @@ store guidelines on titles, icons and copy.
 | [.agents/naming.md](.agents/naming.md)         | Naming files, identifiers, commands                                      |
 | [.agents/typescript.md](.agents/typescript.md) | Writing any TypeScript                                                   |
 | [.agents/raycast.md](.agents/raycast.md)       | Touching commands, components, hooks, the API client, preferences, tests |
+| [.agents/store.md](.agents/store.md)           | Manifest, naming, icons, screenshots, changelog, or submitting           |
 | [.agents/workflow.md](.agents/workflow.md)     | Running commands, changing dependencies or migrations                    |
 | [.agents/git.md](.agents/git.md)               | Writing a commit message                                                 |
 | [.agents/secrets.md](.agents/secrets.md)       | Anything involving environment variables                                 |
@@ -53,8 +56,9 @@ already in use, e.g. status-line-first `Detail` views, no-hex colors) first.
 1. What the user explicitly asks for.
 2. `docs/architecture.md` on structure.
 3. `.agents/context/PRODUCT.md` / `.agents/context/DESIGN.md` on product intent and UI patterns.
-4. `.agents/` on style and conventions.
-5. Your own defaults.
+4. `.agents/store.md` on anything the Raycast review checks.
+5. The rest of `.agents/` on style and conventions.
+6. Your own defaults.
 
 New code follows the rules. If existing code doesn't match a rule, leave it
 unless you're already editing that file for another reason, and even then don't
