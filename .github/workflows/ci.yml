@@ -33,6 +33,9 @@ jobs:
 
       - name: Lint
         run: pnpm lint
+        # CI=true makes ray lint demand a pnpm-free checkout; that only applies to the store PR
+        env:
+          CI: ""
 
       - name: Build
         run: pnpm build

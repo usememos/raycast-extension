@@ -39,6 +39,11 @@ output. Don't claim success.
   symlink it cannot resolve (`Cannot read properties of null (reading
   'matches')`). `pnpm lockfile` resolves in a temp directory and copies the
   result back. Never run a plain `npm install` here either.
+
+  `ray lint` validates lock files only when `CI=true`, and then it demands a
+  pnpm-free checkout this repo can never be. That is why the lint step in
+  `.github/workflows/ci.yml` clears `CI`; don't remove it. The submission
+  lockfile is covered by `pnpm store-check --submission` instead.
 - **Change packages only through the CLI**: `pnpm add <pkg>`,
   `pnpm add -D <pkg>`, `pnpm up --latest <pkg>`, `pnpm remove <pkg>`. Never
   type a dependency or version into `package.json`.
