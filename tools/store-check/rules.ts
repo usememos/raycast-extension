@@ -496,7 +496,7 @@ export const checkPackageLock = (manifest: Manifest, lock: string | undefined): 
         check: "submission.packageLock",
         subject: "package-lock.json",
         message:
-          "is missing. Raycast's CI builds with npm: run `npm install --package-lock-only` before the store PR.",
+          "is missing. Raycast's CI builds with npm: run `pnpm lockfile` before the store PR.",
       },
     ];
   }
@@ -510,7 +510,7 @@ export const checkPackageLock = (manifest: Manifest, lock: string | undefined): 
         {
           check: "submission.packageLockStale",
           subject: "package-lock.json",
-          message: "does not match the dependencies in package.json. Re-run `npm install --package-lock-only`.",
+          message: "does not match the dependencies in package.json. Re-run `pnpm lockfile`.",
         },
       ];
 };

@@ -17,6 +17,7 @@
 | Type check                   | `pnpm typecheck`                                   |
 | Tests                        | `pnpm test`                                        |
 | Store compliance             | `pnpm store-check`                                 |
+| npm lockfile (submission)    | `pnpm lockfile`                                    |
 | Publish to the Raycast Store | `pnpm run publish` (never `npm publish`)           |
 
 **Done means** `pnpm lint && pnpm build && pnpm typecheck && pnpm test` passes,
@@ -28,17 +29,16 @@ output. Don't claim success.
 
 - **pnpm only for development.** Never npm or yarn for installing, upgrading
   or removing packages, and never commit `yarn.lock`.
-- **One exception, at submission only.** Raycast's CI builds with npm, so the
-  store submission PR must carry a `package-lock.json`. Generate it as the
-  last step before opening that PR, without touching `node_modules`:
+- **One exception, `package-lock.json`.** Raycast's CI builds with npm, so the
+  store submission PR must carry one. It is committed, so regenerate it with
+  `pnpm lockfile` whenever `package.json` dependencies change, and never let it
+  drift — `pnpm store-check --submission` checks that it matches.
 
-  ```
-  npm install --package-lock-only
-  ```
-
-  Never run a plain `npm install` in this checkout, and never let
-  `package-lock.json` drift from `package.json` afterwards —
-  `pnpm store-check --submission` checks that it matches.
+  **Never run `npm install --package-lock-only` directly in this checkout.** npm
+  reads the existing pnpm `node_modules`, walks into `.pnpm/` and dies on a
+  symlink it cannot resolve (`Cannot read properties of null (reading
+  'matches')`). `pnpm lockfile` resolves in a temp directory and copies the
+  result back. Never run a plain `npm install` here either.
 - **Change packages only through the CLI**: `pnpm add <pkg>`,
   `pnpm add -D <pkg>`, `pnpm up --latest <pkg>`, `pnpm remove <pkg>`. Never
   type a dependency or version into `package.json`.
@@ -58,6 +58,17 @@ In order. Stop at the first failure.
 4. Capture screenshots into `metadata/` (Window Capture, `Save to Metadata`).
 5. Move the `{PR_MERGE_DATE}` entry in `CHANGELOG.md` to the top and make sure
    it describes this release.
-6. `npm install --package-lock-only`
+6. `pnpm lockfile`
 7. `pnpm store-check --submission` — must be green.
-8. `pnpm run publish`
+8. Commit the lockfile swap on a throwaway branch. `ray publish` validates the
+   working directory before it copies anything: it refuses a dirty tree and
+   rejects `pnpm-lock.yaml` outright ("pnpm is not supported").
+
+   ```
+   git switch -c submission
+   git rm pnpm-lock.yaml pnpm-workspace.yaml
+   git commit -m "chore(submission): Drop pnpm lockfile for npm"
+   ```
+
+9. `pnpm run publish`
+10. `git switch main && git branch -D submission`

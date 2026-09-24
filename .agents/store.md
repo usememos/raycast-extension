@@ -74,9 +74,11 @@ These are the rules it can't:
 
 ## Submitting
 
-- **Generate the lockfile last.** Raycast's CI runs npm, so the submission PR
-  carries a `package-lock.json` (`npm install --package-lock-only`). Day-to-day
-  work stays on pnpm — see [workflow.md](workflow.md).
+- **Keep `package-lock.json` current.** Raycast's CI runs npm, so the submission
+  PR carries one. Regenerate it with `pnpm lockfile` — never `npm install`
+  directly, which crashes on pnpm's `node_modules`. Drop `pnpm-lock.yaml` from
+  the submission commit: `ray publish` rejects it. Day-to-day work stays on
+  pnpm — see [workflow.md](workflow.md).
 - **Run the distribution build** (`pnpm build`) and open the extension in
   Raycast to check it against the optimized bundle, not just `pnpm dev`.
 - **Read the [Extension Guidelines](https://manual.raycast.com/extensions-guidelines)**
