@@ -263,6 +263,23 @@ describe("checkAssets", () => {
     const sources = [{ path: "components/List.tsx", text: 'icon="empty.png"' }];
     expect(checkAssets(manifest(), assets, sources)).toEqual([]);
   });
+
+  it("accepts the dark variant of a referenced asset", () => {
+    const assets = [
+      { name: "usememos.png", bytes: png(512, 512) },
+      { name: "usememos@dark.png", bytes: png(512, 512) },
+    ];
+    expect(checkAssets(manifest(), assets, [])).toEqual([]);
+  });
+
+  it("rejects the dark variant of an unreferenced asset", () => {
+    const assets = [
+      { name: "usememos.png", bytes: png(512, 512) },
+      { name: "leftover@dark.png", bytes: png(512, 512) },
+    ];
+    const violations = checkAssets(manifest(), assets, []);
+    expect(violations[0]?.subject).toBe("leftover@dark.png");
+  });
 });
 
 describe("checkRootNavigationTitle", () => {

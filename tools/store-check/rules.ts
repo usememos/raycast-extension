@@ -357,7 +357,7 @@ export const checkReadme = (readme: string | undefined): Violation[] => {
 export const checkAssets = (manifest: Manifest, assets: Asset[], sources: Source[]): Violation[] => {
   const haystack = [JSON.stringify(manifest), ...sources.map((source) => source.text)].join("\n");
   return assets
-    .filter((asset) => !haystack.includes(asset.name))
+    .filter((asset) => !haystack.includes(asset.name.replace(/@dark(?=\.[^.]+$)/, "")))
     .map((asset) => ({
       check: "assets.unused",
       subject: asset.name,
