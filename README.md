@@ -1,6 +1,9 @@
 # Memos for Raycast
 
-<img src="./assets/usememos.png" alt="" width="64" align="right">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/usememos@dark.png">
+  <img src="./assets/usememos.png" alt="" width="64" align="right">
+</picture>
 
 The official [Memos](https://usememos.com) extension for [Raycast](https://www.raycast.com/). Capture, find and manage your memos without leaving Raycast. It works with any Memos instance, self-hosted or the public demo. Find the Memos project on [GitHub](https://github.com/usememos/memos).
 
